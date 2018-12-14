@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.atlassian.event:atlassian-event:4.0.0-07963a34">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/atlassian/event/atlassian-event/4.0.0-07963a34/atlassian-event-4.0.0-07963a34.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/atlassian/event/atlassian-event/4.0.0-07963a34/atlassian-event-4.0.0-07963a34-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/atlassian/event/atlassian-event/4.0.0-07963a34/atlassian-event-4.0.0-07963a34-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
