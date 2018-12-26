@@ -36,7 +36,13 @@ public class JiraRest {
         StringBuffer response = new StringBuffer();
         while ((line = in.readLine()) != null) {
             System.out.println(response.append(line));
-            JSONParser parser = new JSONParser();
+            JSONParser parser = null;
+            try {
+                parser = new JSONParser();
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
 
             try {
                 Object obj = parser.parse(line);
