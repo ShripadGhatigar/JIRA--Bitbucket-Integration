@@ -28,7 +28,7 @@ import java.io.IOException;
 
 import java.io.File;
 import org.apache.http.client.ClientProtocolException;
-
+import com.example.tutorial.plugins.JiraRest;
 
 @ExportAsService
 @Component
@@ -36,13 +36,13 @@ import org.apache.http.client.ClientProtocolException;
 
 public class IssueCreatedResolvedListener implements InitializingBean, DisposableBean {
 
-    public static  String IMPORTED_SCENARIO_DIRECTORY = System.getProperty("importedScenarioDirectory", "target/TestsImportedFromJira");
+    public static String IMPORTED_SCENARIO_DIRECTORY = System.getProperty("importedScenarioDirectory", "target/TestsImportedFromJira");
 
     public static Issue issue;
     public static final Logger log;
     public static Object obj;
     public static String file_Name = "";
-
+    public static String value;
 
 
     static {
@@ -83,43 +83,54 @@ public class IssueCreatedResolvedListener implements InitializingBean, Disposabl
 
 
     @EventListener
-    public  static void processIssueEvent(IssueEvent issueEvent) throws ClientProtocolException,IOException {
-    Long eventTypeId = issueEvent.getEventTypeId();
-       log.info("\n *** The EventTypeID is {} ",issueEvent.getEventTypeId());
+    public static void processIssueEvent(IssueEvent issueEvent) throws ClientProtocolException, Exception {
+        Long eventTypeId = issueEvent.getEventTypeId();
+        log.info("\n *** The EventTypeID is {} ", issueEvent.getEventTypeId());
 
         issue = issueEvent.getIssue();
         log.info("\n******The Issue is {} *****.\n ", issue);
-        //String value = JiraRest.getCucumbervalue(issue.getKey());
 
-        log.info("\n*********The File Name is {}",file_Name);
+        log.info("\n******The IssueType  is {} *****.\n ", issue.getIssueType().getName());
+        log.info("\n******The IssueTypeID  is {} *****.\n ", issue.getIssueTypeId());
+
+        try {
+            value = JiraRest.getCucumbervalue(issue.getKey());
+        } catch (Exception e) {
+            log.info("Something failed while parsing Json {}", e.getMessage());
+            e.printStackTrace();
+        }
+        log.info("\n*********The Value is {}", value);
+
+        //log.info("\n*********The File Name is {}", file_Name);
         //log.info("####The Value of JIRA Test is " + value);
-      // if (value.equalsIgnoreCase("cucumber")) {
-           // if it's an event we're interested in, log it
-           if (eventTypeId.equals(EventType.ISSUE_CREATED_ID)) {
-               log.info("\n\n\t#+#+# Issue {} has been created at {}.\n", issue.getKey(), issue.getCreated());
-               log.info("\n\n calling the XrayAPi method \n");
-               String fileContent = XrayApi.getIssuekeyfromJIRA(issue.getKey());
-               log.info("\n\n file content \n {} ", fileContent);
-               BitbucketAPI.createFileBitbucket(IMPORTED_SCENARIO_DIRECTORY + "_" + issue.getKey() + ".feature", fileContent);
-               log.info("\n\n Closed the XrayAPi method \n");
-               //log.info("\n\n The Feature File File Name is {} ",FeatureFile.File_Name );
-               // log.info("\n\n Ending the Bitbucket method {} \n", IMPORTED_SCENARIO_DIRECTORY);
-           } else if (eventTypeId.equals(EventType.ISSUE_UPDATED_ID)) {
-               log.info("\n\n\t#+#+# Issue {} has been updated at {}.\n", issue.getKey(), issue.getUpdated());
-               String fileContent = XrayApi.getIssuekeyfromJIRA(issue.getKey());
-               log.info("\n\n file content \n {} ", fileContent);
+         if (value.equalsIgnoreCase("Cucumber")) {
+             // if it's an event we're interested in, log it
 
-               BitbucketAPI.createFileBitbucket(IMPORTED_SCENARIO_DIRECTORY + "_" + issue.getKey() + ".feature", fileContent);
-           } else if (eventTypeId.equals(EventType.ISSUE_DELETED_ID)) {
-               log.info("\n\n\t#+#+# Issue {} has been Deleted at {}.\n", issue.getKey(), issue.getUpdated());
+             if (eventTypeId.equals(EventType.ISSUE_CREATED_ID)) {
+                 log.info("\n\n\t#+#+# Issue {} has been created at {}.\n", issue.getKey(), issue.getCreated());
+                 log.info("\n\n calling the XrayAPi method \n");
+                 String fileContent = XrayApi.getIssuekeyfromJIRA(issue.getKey());
+                 log.info("\n\n file content \n {} ", fileContent);
+                 BitbucketAPI.createFileBitbucket(IMPORTED_SCENARIO_DIRECTORY + "_" + issue.getKey() + ".feature", fileContent);
+                 log.info("\n\n Closed the XrayAPi method \n");
 
-           } else {
-               log.warn("\n\n\t#+#+# Unhandled event type\n");
-           }
 
+                 //log.info("\n\n The Feature File File Name is {} ",FeatureFile.File_Name );
+                 // log.info("\n\n Ending the Bitbucket method {} \n", IMPORTED_SCENARIO_DIRECTORY);
+             } else if (eventTypeId.equals(EventType.ISSUE_UPDATED_ID)) {
+                 log.info("\n\n\t#+#+# Issue {} has been updated at {}.\n", issue.getKey(), issue.getUpdated());
+                 String fileContent = XrayApi.getIssuekeyfromJIRA(issue.getKey());
+                 log.info("\n\n file content \n {} ", fileContent);
+
+                 BitbucketAPI.createFileBitbucket(IMPORTED_SCENARIO_DIRECTORY + "_" + issue.getKey() + ".feature", fileContent);
+             } /*else if (eventTypeId.equals(EventType.ISSUE_DELETED_ID)) {
+                log.info("\n\n\t#+#+# Issue {} has been Deleted at {}.\n", issue.getKey(), issue.());
+
+            }*/ else {
+                 log.warn("\n\n\t#+#+# Unhandled event type\n");
+             }
+         }
     }
-
-
 
 
 
